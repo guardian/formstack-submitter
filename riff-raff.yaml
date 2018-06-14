@@ -1,0 +1,16 @@
+stacks:
+- content-api-formstack
+regions:
+- eu-west-1
+deployments:
+  formstack:
+    type: aws-lambda
+    parameters:
+      bucket: content-api-dist
+      functions:
+        CODE:
+          name: formstack-submitter-CODE
+          filename: formstack-submitter.zip
+        PROD:
+          name: formstack-submitter-PROD
+          filename: formstack-submitter.zip

@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: "AWS::Serverless-2016-10-31"
+Description: Lambda submitting submissions to FormStack
+Parameters:
+    Stack:
+        Description: Stack name
+        Type: String
+        Default: content-api-formstack
+    App:
+        Description: Application name
+        Type: String
+        Default: formstack-submitter
+    Stage:
+        Description: Stage name
+        Type: String
+        AllowedValues:
+            - PROD
+            - CODE
+        Default: CODE
+    OAuthToken:
+        Description: The authentication token for accessing the FormStack API
+        Type: String
+
+Resources:
+    FormStackLambda:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: !Sub ${App}-${Stage}
+            Handler: com.gu.formstack.FormStackLambda::handle
+            Environment:
+                Variables:
+                    OAUTH_TOKEN: !Ref OAuthToken
+            CodeUri:
+                Bucket: content-api-dist
+                Key: !Sub ${Stack}/${Stage}/${App}/${App}.zip
+            MemorySize: 256
+            Runtime: java8
+            Timeout: 15
