@@ -22,13 +22,14 @@ import scala.collection.JavaConverters._
 abstract class GenericLambda[F[_]: Effect] extends Http4sClientDsl[F] {
   import GenericLambda._
 
-  def run(is: InputStream, os: OutputStream): F[Unit] = for {
-    oauthToken <- getToken
-    body <- is.consume
-    json <- decode(body)
-    resp <- transmit(json, oauthToken)
-    _ <- os.writeAndClose(resp.noSpaces)
-  } yield ()
+  def run(is: InputStream, os: OutputStream): F[Unit] =
+    for {
+      oauthToken <- getToken
+      body <- is.consume
+      json <- decode(body)
+      resp <- transmit(json, oauthToken)
+      _ <- os.writeAndClose(resp.noSpaces)
+    } yield ()
 
   def getEnv: F[Map[String, String]] = Effect[F].delay {
     System.getenv.asScala.toMap
@@ -38,7 +39,8 @@ abstract class GenericLambda[F[_]: Effect] extends Http4sClientDsl[F] {
     getEnv.flatMap { env: Map[String, String] =>
       env.get("OAUTH_TOKEN") match {
         case Some(oauth) => Effect[F].pure(oauth)
-        case None => Effect[F].raiseError(new RuntimeException("Missing OAUTH_TOKEN"))
+        case None =>
+          Effect[F].raiseError(new RuntimeException("Missing OAUTH_TOKEN"))
       }
     }
 
@@ -51,16 +53,18 @@ abstract class GenericLambda[F[_]: Effect] extends Http4sClientDsl[F] {
 
   def getFormId(json: Json): F[String] =
     json.hcursor.downField("formId").as[String] match {
-      case Left(error) => Effect[F].raiseError(error)
+      case Left(error)   => Effect[F].raiseError(error)
       case Right(formId) => Effect[F].pure(formId)
     }
 
-  def transmit(json: Json, oauthToken: String): F[Json] = for {
-    httpClient <- Http1Client[F]()
-    formId <- getFormId(json)
-    request <- POST(endpoint(formId), json)
-    response <- httpClient.expect[Json](request.putHeaders(header(oauthToken)))
-  } yield response
+  def transmit(json: Json, oauthToken: String): F[Json] =
+    for {
+      httpClient <- Http1Client[F]()
+      formId <- getFormId(json)
+      request <- POST(endpoint(formId), json)
+      response <- httpClient.expect[Json](
+        request.putHeaders(header(oauthToken)))
+    } yield response
 }
 
 object GenericLambda {
