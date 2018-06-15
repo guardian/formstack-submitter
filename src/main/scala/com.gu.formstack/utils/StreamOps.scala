@@ -2,7 +2,7 @@ package com.gu.formstack.utils
 
 // ------------------------------------------------------------------------
 import cats.effect.Sync
-import java.io.{InputStream, OutputStream}
+import java.io.{ InputStream, OutputStream }
 import java.nio.charset.StandardCharsets
 import scala.io.Source
 // ------------------------------------------------------------------------

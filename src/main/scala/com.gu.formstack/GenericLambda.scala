@@ -5,11 +5,11 @@ import cats.effect.Effect
 import cats.syntax.functor._
 import cats.syntax.flatMap._
 import com.gu.formstack.utils.StreamOps._
-import io.circe.{Json, Decoder}
+import io.circe.{ Decoder, Json }
 import io.circe.parser.parse
 import io.circe.syntax._
-import java.io.{InputStream, OutputStream}
-import org.http4s.{AuthScheme, Credentials, Header, Request, Uri}
+import java.io.{ InputStream, OutputStream }
+import org.http4s.{ AuthScheme, Credentials, Header, Request, Uri }
 import org.http4s.circe._
 import org.http4s.client.blaze._
 import org.http4s.client.dsl.Http4sClientDsl
@@ -24,10 +24,10 @@ abstract class GenericLambda[F[_]: Effect] extends Http4sClientDsl[F] {
   def run(is: InputStream, os: OutputStream): F[Unit] =
     for {
       oauthToken <- getToken
-      body <- is.consume
-      json <- decode(body)
-      resp <- transmit(json, oauthToken)
-      _ <- os.writeAndClose(resp.noSpaces)
+      body       <- is.consume
+      json       <- decode(body)
+      resp       <- transmit(json, oauthToken)
+      _          <- os.writeAndClose(resp.noSpaces)
     } yield ()
 
   def getEnv: F[Map[String, String]] = Effect[F].delay {
@@ -59,10 +59,9 @@ abstract class GenericLambda[F[_]: Effect] extends Http4sClientDsl[F] {
   def transmit(json: Json, oauthToken: String): F[Json] =
     for {
       httpClient <- Http1Client[F]()
-      formId <- getFormId(json)
-      request <- POST(endpoint(formId), json)
-      response <- httpClient.expect[Json](
-        request.putHeaders(header(oauthToken)))
+      formId     <- getFormId(json)
+      request    <- POST(endpoint(formId), json)
+      response   <- httpClient.expect[Json](request.putHeaders(header(oauthToken)))
     } yield response
 }
 

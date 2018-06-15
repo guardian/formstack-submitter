@@ -1,8 +1,8 @@
 lazy val root = (project in file("."))
   .settings(
-    name          := "formstack-submitter",
-    organization  := "com.gu",
-    scalaVersion  := "2.12.6",
+    name         := "formstack-submitter",
+    organization := "com.gu",
+    scalaVersion := "2.12.6",
     scalacOptions ++= scalacOpts,
     libraryDependencies ++= Dependencies.circe ++ Dependencies.aws ++ Dependencies.http4s,
     Universal / topLevelDirectory := None,
@@ -11,7 +11,7 @@ lazy val root = (project in file("."))
     riffRaffUploadArtifactBucket  := Option("riffraff-artifact"),
     riffRaffUploadManifestBucket  := Option("riffraff-builds"),
     riffRaffManifestProjectName   := s"Off-platform::${name.value}",
-    riffRaffArtifactResources     += (file("cloudformation.yaml"), s"${name.value}-cfn/cfn.yaml")
+    riffRaffArtifactResources += (file("cloudformation.yaml"), s"${name.value}-cfn/cfn.yaml")
   )
   .enablePlugins(RiffRaffArtifact, JavaAppPackaging)
 
@@ -20,7 +20,9 @@ val scalacOpts = Seq(
   "-Ypartial-unification",
   "-language:existentials",
   "-language:higherKinds",
-  "-encoding", "utf-8",
+  "-encoding",
+  "utf-8",
   "-deprecation",
   "-feature"
+) "-feature"
 )
