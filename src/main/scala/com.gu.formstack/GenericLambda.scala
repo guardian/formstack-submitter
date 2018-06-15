@@ -9,12 +9,11 @@ import io.circe.{Json, Decoder}
 import io.circe.parser.parse
 import io.circe.syntax._
 import java.io.{InputStream, OutputStream}
-import org.http4s.Header
-import org.http4s.Request
-import org.http4s.Uri
+import org.http4s.{AuthScheme, Credentials, Header, Request, Uri}
 import org.http4s.circe._
 import org.http4s.client.blaze._
 import org.http4s.client.dsl.Http4sClientDsl
+import org.http4s.headers.Authorization
 import org.http4s.Method.POST
 import scala.collection.JavaConverters._
 // ------------------------------------------------------------------------
@@ -72,5 +71,5 @@ object GenericLambda {
     Uri.uri("https://www.formstack.com/api/v2/form/") / formId / "submission.json"
 
   def header(oauth: String): Header =
-    Header("Authorization", s"Bearer $oauth")
+    Authorization(Credentials.Token(AuthScheme.Bearer, oauth))
 }
