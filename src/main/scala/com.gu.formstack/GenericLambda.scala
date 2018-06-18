@@ -9,11 +9,11 @@ import io.circe.{ Decoder, Json }
 import io.circe.parser.parse
 import io.circe.syntax._
 import java.io.{ InputStream, OutputStream }
-import org.http4s.{ AuthScheme, Credentials, Header, Request, Uri }
+import org.http4s.{ AuthScheme, Credentials, Header, Request, Response, Uri }
 import org.http4s.circe._
 import org.http4s.client.blaze._
 import org.http4s.client.dsl.Http4sClientDsl
-import org.http4s.headers.Authorization
+import org.http4s.headers.{ Authorization, `Access-Control-Allow-Origin` }
 import org.http4s.Method.POST
 import scala.collection.JavaConverters._
 // ------------------------------------------------------------------------
@@ -61,8 +61,15 @@ abstract class GenericLambda[F[_]: Effect] extends Http4sClientDsl[F] {
       httpClient <- Http1Client[F]()
       formId     <- getFormId(json)
       request    <- POST(endpoint(formId), json)
-      response   <- httpClient.expect[Json](request.putHeaders(header(oauthToken)))
+      response   <- httpClient.fetch(request.putHeaders(header(oauthToken)))(format)
     } yield response
+
+  def format(response: Response[F]): F[Json] =
+    response.as[Json].map(json => Json.obj(
+      "isBase64Encoded" -> Json.False,
+      "statusCode" -> Json.fromInt(response.status.code),
+      "body" -> Json.fromString(json.noSpaces)
+    ))
 }
 
 object GenericLambda {
