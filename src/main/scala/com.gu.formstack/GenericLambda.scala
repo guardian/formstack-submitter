@@ -1,14 +1,14 @@
 package com.gu.formstack
 
 // ------------------------------------------------------------------------
-import cats.effect.Effect
+import cats.effect.{Effect, Sync}
 import cats.syntax.functor._
 import cats.syntax.flatMap._
-import com.gu.formstack.utils.StreamOps._
 import io.circe.{ Decoder, Json }
 import io.circe.parser.parse
 import io.circe.syntax._
 import java.io.{ InputStream, OutputStream }
+import java.nio.charset.StandardCharsets
 import org.http4s.{ AuthScheme, Credentials, Header, Request, Response, Uri }
 import org.http4s.circe._
 import org.http4s.client.blaze._
@@ -16,6 +16,7 @@ import org.http4s.client.dsl.Http4sClientDsl
 import org.http4s.headers.{ Authorization, `Access-Control-Allow-Origin` }
 import org.http4s.Method.POST
 import scala.collection.JavaConverters._
+import scala.io.Source
 // ------------------------------------------------------------------------
 
 abstract class GenericLambda[F[_]: Effect] extends Http4sClientDsl[F] {
@@ -24,10 +25,10 @@ abstract class GenericLambda[F[_]: Effect] extends Http4sClientDsl[F] {
   def run(is: InputStream, os: OutputStream): F[Unit] =
     for {
       oauthToken <- getToken
-      body       <- is.consume
+      body       <- consume(is)
       json       <- decode(body)
       resp       <- transmit(json, oauthToken)
-      _          <- os.writeAndClose(resp.noSpaces)
+      _          <- writeAndClose(os, resp.noSpaces)
     } yield ()
 
   def getEnv: F[Map[String, String]] = Effect[F].delay {
@@ -78,4 +79,16 @@ object GenericLambda {
 
   def header(oauth: String): Header =
     Authorization(Credentials.Token(AuthScheme.Bearer, oauth))
+
+  def consume[F[_]: Sync](is: InputStream): F[String] = Sync[F].delay {
+    val contents = Source.fromInputStream(is).mkString
+    is.close()
+    contents
+  }
+
+  def writeAndClose[F[_]: Sync](os: OutputStream, contents: String): F[Unit] = Sync[F].delay {
+    os.write(contents.getBytes(StandardCharsets.UTF_8))
+    os.close()
+  }
+
 }
