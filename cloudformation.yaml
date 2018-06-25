@@ -36,3 +36,29 @@ Resources:
             MemorySize: 256
             Runtime: java8
             Timeout: 15
+    ApiFrontend:
+        Type: AWS::ApiGateway::Method
+        Properties:
+            AuthorizationType: NONE
+            HttpMethod: POST
+            ResourceId: !Ref APIResource
+            RestApiId: !Ref APIRestAPI
+            Integration:
+                Type: AWS_PROXY
+                IntegrationHttpMethod: POST
+                Uri: !Sub
+                  - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Arn}/invocations
+                  - Arn: !GetAtt FormStackLambda.Arn
+    APIRestAPI:
+        Type: AWS::ApiGateway::RestApi
+        Properties:
+            Name: FormstackAPI
+    APIResource:
+        Type: AWS::ApiGateway::Resource
+        Properties:
+            RestApiId: !Ref APIRestAPI
+            PathPart: "formstack"
+            ParentId:
+                Fn::GetAtt: 
+                  - "APIRestAPI"
+                  - "RootResourceId"
