@@ -10,7 +10,7 @@ deployments:
       functions:
         CODE:
           name: formstack-submitter-CODE
-          filename: formstack-submitter.zip
+          filename: formstack-submitter.tgz
         PROD:
           name: formstack-submitter-PROD
-          filename: formstack-submitter.zip
+          filename: formstack-submitter.tgz
