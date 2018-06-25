@@ -7,13 +7,12 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Dependencies.circe ++ Dependencies.aws ++ Dependencies.http4s,
     Universal / topLevelDirectory := None,
     Universal / packageName       := normalizedName.value,
-    riffRaffPackageType           := (Universal / dist).value,
+    riffRaffPackageType           := (Universal / packageZipTarball).value,
     riffRaffUploadArtifactBucket  := Option("riffraff-artifact"),
     riffRaffUploadManifestBucket  := Option("riffraff-builds"),
-    riffRaffManifestProjectName   := s"Off-platform::${name.value}",
-    riffRaffArtifactResources += (file("cloudformation.yaml"), s"${name.value}-cfn/cfn.yaml")
+    riffRaffManifestProjectName   := s"Content Platforms::${name.value}"
   )
-  .enablePlugins(RiffRaffArtifact, JavaAppPackaging)
+  .enablePlugins(RiffRaffArtifact, UniversalPlugin)
 
 val scalacOpts = Seq(
   "-Xfatal-warnings",
@@ -24,5 +23,4 @@ val scalacOpts = Seq(
   "utf-8",
   "-deprecation",
   "-feature"
-) "-feature"
 )

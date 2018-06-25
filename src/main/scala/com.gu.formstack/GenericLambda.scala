@@ -1,7 +1,7 @@
 package com.gu.formstack
 
 // ------------------------------------------------------------------------
-import cats.effect.{Effect, Sync}
+import cats.effect.{ Effect, Sync }
 import cats.syntax.functor._
 import cats.syntax.flatMap._
 import io.circe.{ Decoder, Json }
@@ -13,7 +13,7 @@ import org.http4s.{ AuthScheme, Credentials, Header, Request, Response, Uri }
 import org.http4s.circe._
 import org.http4s.client.blaze._
 import org.http4s.client.dsl.Http4sClientDsl
-import org.http4s.headers.{ Authorization, `Access-Control-Allow-Origin` }
+import org.http4s.headers.{ `Access-Control-Allow-Origin`, Authorization }
 import org.http4s.Method.POST
 import scala.collection.JavaConverters._
 import scala.io.Source
@@ -25,10 +25,10 @@ abstract class GenericLambda[F[_]: Effect] extends Http4sClientDsl[F] {
   def run(is: InputStream, os: OutputStream): F[Unit] =
     for {
       oauthToken <- getToken
-      body       <- consume(is)
-      json       <- decode(body)
-      resp       <- transmit(json, oauthToken)
-      _          <- writeAndClose(os, resp.noSpaces)
+      body <- consume(is)
+      json <- decode(body)
+      resp <- transmit(json, oauthToken)
+      _ <- writeAndClose(os, resp.noSpaces)
     } yield ()
 
   def getEnv: F[Map[String, String]] = Effect[F].delay {
@@ -60,17 +60,22 @@ abstract class GenericLambda[F[_]: Effect] extends Http4sClientDsl[F] {
   def transmit(json: Json, oauthToken: String): F[Json] =
     for {
       httpClient <- Http1Client[F]()
-      formId     <- getFormId(json)
-      request    <- POST(endpoint(formId), json)
-      response   <- httpClient.fetch(request.putHeaders(header(oauthToken)))(format)
+      formId <- getFormId(json)
+      request <- POST(endpoint(formId), json)
+      response <- httpClient.fetch(request.putHeaders(header(oauthToken)))(format)
     } yield response
 
   def format(response: Response[F]): F[Json] =
-    response.as[Json].map(json => Json.obj(
-      "isBase64Encoded" -> Json.False,
-      "statusCode" -> Json.fromInt(response.status.code),
-      "body" -> Json.fromString(json.noSpaces)
-    ))
+    response
+      .as[Json]
+      .map(
+        json =>
+          Json.obj(
+            "isBase64Encoded" -> Json.False,
+            "statusCode" -> Json.fromInt(response.status.code),
+            "body" -> Json.fromString(json.noSpaces)
+        )
+      )
 }
 
 object GenericLambda {
