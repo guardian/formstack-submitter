@@ -6,11 +6,9 @@ import com.amazonaws.services.lambda.runtime.Context
 import java.io.{ InputStream, OutputStream }
 // ------------------------------------------------------------------------
 
-class FormStackLambda extends IOLambda {
+trait IOLambda {
+  def main(is: InputStream, os: OutputStream, ctx: Context): IO[Unit]
 
-  def main(is: InputStream, os: OutputStream, ctx: Context): IO[Unit] = for {
-    process <- Process[IO]
-    _ <- process.run(is, os)
-  } yield ()
-
+  def handle(is: InputStream, os: OutputStream, ctx: Context): Unit =
+    main(is, os, ctx).unsafeRunSync
 }

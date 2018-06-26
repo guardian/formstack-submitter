@@ -17,6 +17,7 @@ lazy val root = (project in file("."))
 val scalacOpts = Seq(
   "-Xfatal-warnings",
   "-Ypartial-unification",
+  "-Ywarn-unused:imports",
   "-language:existentials",
   "-language:higherKinds",
   "-encoding",
