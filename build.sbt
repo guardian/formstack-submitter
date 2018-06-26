@@ -12,7 +12,7 @@ lazy val root = (project in file("."))
     riffRaffUploadManifestBucket  := Option("riffraff-builds"),
     riffRaffManifestProjectName   := s"Content Platforms::${name.value}"
   )
-  .enablePlugins(RiffRaffArtifact, UniversalPlugin)
+  .enablePlugins(RiffRaffArtifact, JavaAppPackaging)
 
 val scalacOpts = Seq(
   "-Xfatal-warnings",

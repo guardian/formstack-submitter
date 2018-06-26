@@ -7,10 +7,6 @@ deployments:
     type: aws-lambda
     parameters:
       bucket: content-api-dist
-      functions:
-        CODE:
-          name: formstack-submitter-CODE
-          filename: formstack-submitter.tgz
-        PROD:
-          name: formstack-submitter-PROD
-          filename: formstack-submitter.tgz
+      functionNames: [formstack-submitter]
+      fileName: formstack-submitter.zip
+      prefixStack: false
