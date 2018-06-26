@@ -8,5 +8,5 @@ deployments:
     parameters:
       bucket: content-api-dist
       functionNames: [formstack-submitter]
-      fileName: formstack-submitter.zip
+      fileName: formstack-submitter.tgz
       prefixStack: false
