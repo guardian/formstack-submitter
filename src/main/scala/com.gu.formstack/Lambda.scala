@@ -19,7 +19,7 @@ class FormStackLambda {
     Environment.getToken match {
       case Some(oauthToken) =>
         for {
-          process <- Process[IO](oauthToken, logger)
+          process <- Process(oauthToken, logger)
           res <- process.run(body)
         } yield res
       case None => throw new RuntimeException("Missing OAUTH_TOKEN")
