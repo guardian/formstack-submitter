@@ -3,7 +3,7 @@ import sbt._
 object Dependencies {
   val awsVersion = "1.1.0"
   val circeVersion = "0.9.3"
-  val http4sVersion = "0.18.2"
+  val http4sVersion = "0.18.13"
   val log4jVersion = "2.8.2"
 
   lazy val circe = Seq(
