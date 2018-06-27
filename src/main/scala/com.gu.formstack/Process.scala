@@ -11,13 +11,11 @@ class Process private (
   val requestBody: RequestBody,
   val logger: LoggingService
 ) {
-  def run(body: String): IO[String] = {
-    logger.info(s"Received $body")
+  def run(body: String): IO[String] = 
     for {
       json <- requestBody.decode(body)
       resp <- submitter.transmit(json)
     } yield resp.noSpaces
-  }
 }
 
 object Process {
