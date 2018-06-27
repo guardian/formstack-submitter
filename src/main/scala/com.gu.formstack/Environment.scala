@@ -10,7 +10,12 @@ class Environment[F[_]] {
   implicit val sync: Sync[F] = Sync[F]
 
   def getEnv: F[Map[String, String]] = sync.delay {
-    System.getenv.asScala.toMap
+    Option(System.getenv).map(_.asScala.toMap)
+  }.flatMap {
+    case None =>
+      Sync[F].raiseError(new RuntimeException("Environment is empty"))
+    case Some(x) =>
+      Sync[F].pure(x)
   }
 
   def getToken: F[String] =
