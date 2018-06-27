@@ -5,6 +5,9 @@ object Dependencies {
   val circeVersion = "0.9.3"
   val http4sVersion = "0.18.2"
   val log4jVersion = "2.8.2"
+  val catsEffectVersion = "1.0.0-RC2"
+
+  lazy val catsEffect = Seq("org.typelevel" %% "cats-effect" % catsEffectVersion)
 
   lazy val circe = Seq(
     "circe-core",
