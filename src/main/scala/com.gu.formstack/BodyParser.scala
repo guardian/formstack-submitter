@@ -6,7 +6,7 @@ import io.circe.Json
 import io.circe.parser.parse
 // ------------------------------------------------------------------------
 
-class RequestBody[F[_]] {
+class RequestBody[F[_]](logger: LoggingService[F]) {
   implicit val sync: Sync[F] = Sync[F]
 
   def decode(body: String): F[Json] = sync.suspend {

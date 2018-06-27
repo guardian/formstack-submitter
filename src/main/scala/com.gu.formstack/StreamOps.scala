@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets
 import scala.io.Source
 // ------------------------------------------------------------------------
 
-class StreamOps[F[_]] {
+class StreamOps[F[_]](val logger: LoggingService[F]) {
   implicit val sync: Sync[F] = Sync[F]
 
   def consume(is: InputStream): F[String] = sync.delay {

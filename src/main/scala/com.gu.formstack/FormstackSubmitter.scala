@@ -4,6 +4,7 @@ package com.gu.formstack
 import cats.effect.Effect
 import cats.syntax.functor._
 import cats.syntax.flatMap._
+import cats.syntax.flatMap._
 import io.circe.Json
 import org.http4s.{ AuthScheme, Credentials, Header, Response, Uri }
 import org.http4s.circe._
@@ -13,7 +14,7 @@ import org.http4s.headers.Authorization
 import org.http4s.Method.POST
 // ------------------------------------------------------------------------
 
-class FormstackSubmitter[F[_]: Effect](httpClient: Client[F], oauthToken: String) extends Http4sClientDsl[F] {
+class FormstackSubmitter[F[_]: Effect](httpClient: Client[F], oauthToken: String, logger: LoggingService[F]) extends Http4sClientDsl[F] {
   import FormstackSubmitter._
 
   def transmit(json: Json): F[Json] =
