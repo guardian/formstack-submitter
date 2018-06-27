@@ -8,8 +8,8 @@ import cats.syntax.flatMap._
 class Environment[F[_]] {
   implicit val sync: Sync[F] = Sync[F]
 
-  def getEnv: F[java.util.Map[String, String]] = sync.delay {
-    System.getenv
+  def getEnv: F[java.util.Map[String, String]] = sync.pure {
+    System.getenv()
   }
 
   def getToken: F[String] =
