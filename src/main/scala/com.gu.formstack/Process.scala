@@ -21,7 +21,6 @@ class Process[F[_]: Effect] private (
 
 object Process {
   def apply[F[_]: Effect](oauthToken: String): F[Process[F]] = {
-
     for {
       logger <- LoggingService("FormstackSubmitter")
       httpClient <- Http1Client()
