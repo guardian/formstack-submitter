@@ -52,6 +52,7 @@ Resources:
             Runtime: java8
             Timeout: 15
     ApiFrontend:
+        DependsOn: APIPermission
         Type: AWS::ApiGateway::Method
         Properties:
             AuthorizationType: NONE
@@ -68,6 +69,30 @@ Resources:
         Type: AWS::ApiGateway::RestApi
         Properties:
             Name: FormstackAPI
+    APIPermission:
+        Type: AWS::Lambda::Permission
+        Properties:
+            Action: lambda:invokeFunction
+            FunctionName: !Sub ${FormStackLambda.Arn}
+            Principal: apigateway.amazonaws.com
+            SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId$}:${APIRestAPI}/*
+    APIStage:
+        Type: AWS::ApiGateway::Stage
+        Properties: 
+            DeploymentId: !Ref APIDeployment
+            MethodSettings:
+                - DataTraceEnabled: true
+                  HttpMethod: "*"
+                  LoggingLevel: INFO
+                  ResourcePath: "/*"
+            RestApiId: !Ref APIRestAPI
+            StageName: LATEST
+    APIDeployment:
+        Type: AWS::ApiGateway::Deployment
+        DependsOn: ApiFrontend
+        Properties:
+            RestApiId: !Ref APIRestAPI
+            StageName: DummyStage
     APIResource:
         Type: AWS::ApiGateway::Resource
         Properties:
