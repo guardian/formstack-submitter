@@ -28,12 +28,13 @@ class Process[F[_]: Effect] private (
 object Process {
   def apply[F[_]: Effect]: F[Process[F]] = {
     val env = new Environment[F]
-    (env.getToken, LoggingService("FormstackSubmitter"), Http1Client()).mapN { case (oauthToken: String, logger: LoggingService[F], httpClient: Client[F]) =>
-      val streamOps = new StreamOps[F](logger)
-      val requestBody = new RequestBody[F](logger)
-      val submitter = new FormstackSubmitter(httpClient, oauthToken, logger)
+    (env.getToken, LoggingService("FormstackSubmitter"), Http1Client()).mapN {
+      case (oauthToken: String, logger: LoggingService[F], httpClient: Client[F]) =>
+        val streamOps = new StreamOps[F](logger)
+        val requestBody = new RequestBody[F](logger)
+        val submitter = new FormstackSubmitter(httpClient, oauthToken, logger)
 
-      new Process(streamOps, submitter, requestBody, logger)
+        new Process(streamOps, submitter, requestBody, logger)
     }
   }
 }

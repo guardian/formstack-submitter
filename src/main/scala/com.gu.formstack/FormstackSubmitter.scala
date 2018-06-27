@@ -14,7 +14,8 @@ import org.http4s.headers.Authorization
 import org.http4s.Method.POST
 // ------------------------------------------------------------------------
 
-class FormstackSubmitter[F[_]: Effect](httpClient: Client[F], oauthToken: String, logger: LoggingService[F]) extends Http4sClientDsl[F] {
+class FormstackSubmitter[F[_]: Effect](httpClient: Client[F], oauthToken: String, logger: LoggingService[F])
+    extends Http4sClientDsl[F] {
   import FormstackSubmitter._
 
   def transmit(json: Json): F[Json] =

@@ -8,9 +8,10 @@ import java.io.{ InputStream, OutputStream }
 
 class FormStackLambda extends IOLambda {
 
-  def main(is: InputStream, os: OutputStream, ctx: Context): IO[Unit] = for {
-    process <- Process[IO]
-    _ <- process.run(is, os)
-  } yield ()
+  def main(is: InputStream, os: OutputStream, ctx: Context): IO[Unit] =
+    for {
+      process <- Process[IO]
+      _ <- process.run(is, os)
+    } yield ()
 
 }
