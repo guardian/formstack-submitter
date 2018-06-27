@@ -22,11 +22,26 @@ Parameters:
         Type: String
 
 Resources:
+    LambdaRole:
+        Type: AWS::IAM::Role
+        Properties:
+            ManagedPolicyArns:
+                - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+            AssumeRolePolicyDocument:
+                Statement:
+                    - Effect: Allow
+                      Principal:
+                          Service:
+                             - lambda.amazonaws.com
+                      Action:
+                          - sts:AssumeRole
+            Path: /
     FormStackLambda:
         Type: AWS::Serverless::Function
         Properties:
             FunctionName: !Sub ${App}-${Stage}
             Handler: com.gu.formstack.FormStackLambda::handle
+            Role: !Sub ${LambdaRole.Arn}
             Environment:
                 Variables:
                     OAUTH_TOKEN: !Ref OAuthToken
