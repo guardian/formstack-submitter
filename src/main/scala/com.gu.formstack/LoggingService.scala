@@ -2,31 +2,21 @@ package com.gu.formstack
 
 // ------------------------------------------------------------------------
 import cats.effect.Sync
-import org.apache.logging.log4j.{ LogManager, Logger }
+import com.amazonaws.services.lambda.runtime.LambdaLogger
 // ------------------------------------------------------------------------
 
-trait LoggingService[F[_]] {
-  def logger: Logger
-  def sync: Sync[F]
+class LoggingService[F[_]](logger: LambdaLogger) {
+  implicit val sync: Sync[F] = Sync[F]
 
   def info(msg: String): F[Unit] = sync.delay {
-    logger.info(msg)
+    logger.log(s"[INFO] $msg")
   }
 
   def warn(msg: String): F[Unit] = sync.delay {
-    logger.warn(msg)
+    logger.log(s"[WARN] $msg")
   }
 
   def error(msg: String, err: Throwable): F[Unit] = sync.delay {
-    logger.error(msg, err)
-  }
-}
-
-object LoggingService {
-  def apply[F[_]: Sync](name: String): F[LoggingService[F]] = Sync[F].delay {
-    new LoggingService[F] {
-      val logger = LogManager.getLogger(name)
-      val sync = Sync[F]
-    }
+    logger.log(s"[ERROR] $msg: $err")
   }
 }
