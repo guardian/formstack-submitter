@@ -11,10 +11,14 @@ class FormStackLambda extends IOLambda {
   def main(is: InputStream, os: OutputStream, ctx: Context): IO[Unit] =
     Environment.getToken match {
       case Some(oauthToken) =>
+        val body = StreamOps.consume(is)
         for {
           process <- Process[IO](oauthToken)
-          _ <- process.run(is, os)
-        } yield ()
+          res <- process.run(body)
+        } yield {
+          StreamOps.writeAndClose(os, res)
+          ()
+        }
       case None => throw new RuntimeException("Missing OAUTH_TOKEN")
     }
 

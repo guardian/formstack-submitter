@@ -6,8 +6,7 @@ import java.nio.charset.StandardCharsets
 import scala.io.Source
 // ------------------------------------------------------------------------
 
-class StreamOps {
-
+object StreamOps {
   def consume(is: InputStream): String = {
     val contents = Source.fromInputStream(is).mkString
     is.close()
