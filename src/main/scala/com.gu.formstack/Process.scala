@@ -11,7 +11,7 @@ import org.http4s.client.blaze.Http1Client
 class Process[F[_]: Effect] private (
   val submitter: FormstackSubmitter[F],
   val requestBody: RequestBody[F],
-  val logger: LoggingService[F]
+  val logger: LoggingService
 ) {
   def run(body: String): F[String] =
     for {
@@ -22,7 +22,7 @@ class Process[F[_]: Effect] private (
 
 object Process {
   def apply[F[_]: Effect](oauthToken: String, logger: LambdaLogger): F[Process[F]] = {
-    val log = new LoggingService[F](logger)
+    val log = new LoggingService(logger)
     for {
       httpClient <- Http1Client()
     } yield {

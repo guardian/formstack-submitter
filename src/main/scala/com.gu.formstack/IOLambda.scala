@@ -12,7 +12,6 @@ trait IOLambda {
   def handle(is: InputStream, os: OutputStream, ctx: Context): Unit = {
     val in = StreamOps.consume(is)
     val logger = ctx.getLogger
-    logger.log(s"Received $in")
     val out = main(in, logger).unsafeRunSync
     StreamOps.writeAndClose(os, out)
   }

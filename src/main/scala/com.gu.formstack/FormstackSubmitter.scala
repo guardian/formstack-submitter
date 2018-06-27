@@ -2,7 +2,6 @@ package com.gu.formstack
 
 // ------------------------------------------------------------------------
 import cats.effect.Effect
-import cats.syntax.apply._
 import cats.syntax.applicativeError._
 import cats.syntax.functor._
 import cats.syntax.flatMap._
@@ -15,7 +14,7 @@ import org.http4s.headers.Authorization
 import org.http4s.Method.POST
 // ------------------------------------------------------------------------
 
-class FormstackSubmitter[F[_]: Effect](httpClient: Client[F], oauthToken: String, logger: LoggingService[F])
+class FormstackSubmitter[F[_]: Effect](httpClient: Client[F], oauthToken: String, logger: LoggingService)
     extends Http4sClientDsl[F] {
   import FormstackSubmitter._
 
@@ -29,7 +28,8 @@ class FormstackSubmitter[F[_]: Effect](httpClient: Client[F], oauthToken: String
   private def getFormId(json: Json): F[String] =
     json.hcursor.downField("formId").as[String] match {
       case Left(e) =>
-        logger.error("Missing `formId` in request payload", e) *> Effect[F].raiseError(e)
+        logger.error("Missing `formId` in request payload", e)
+        Effect[F].raiseError(e)
       case Right(formId) => Effect[F].pure(formId)
     }
 
