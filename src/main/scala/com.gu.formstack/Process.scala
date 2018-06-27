@@ -3,6 +3,7 @@ package com.gu.formstack
 // ------------------------------------------------------------------------
 import cats.effect.Effect
 import cats.syntax.apply._
+import cats.syntax.applicativeError._
 import cats.syntax.functor._
 import cats.syntax.flatMap._
 import java.io.{ InputStream, OutputStream }
@@ -28,13 +29,20 @@ class Process[F[_]: Effect] private (
 object Process {
   def apply[F[_]: Effect]: F[Process[F]] = {
     val env = new Environment[F]
-    (env.getToken, LoggingService("FormstackSubmitter"), Http1Client()).mapN {
-      case (oauthToken: String, logger: LoggingService[F], httpClient: Client[F]) =>
-        val streamOps = new StreamOps[F](logger)
-        val requestBody = new RequestBody[F](logger)
-        val submitter = new FormstackSubmitter(httpClient, oauthToken, logger)
 
-        new Process(streamOps, submitter, requestBody, logger)
-    }
+    for {
+      logger <- LoggingService("FormstackSubmitter")
+      process <- (env.getToken, Http1Client()).mapN {
+        case (oauthToken: String, httpClient: Client[F]) =>
+          val streamOps = new StreamOps[F](logger)
+          val requestBody = new RequestBody[F](logger)
+          val submitter = new FormstackSubmitter(httpClient, oauthToken, logger)
+
+          new Process(streamOps, submitter, requestBody, logger)
+      }.onError {
+        case e: RuntimeException =>
+          logger.error("Lambda configuration is incomplete", e)
+      }
+    } yield process
   }
 }

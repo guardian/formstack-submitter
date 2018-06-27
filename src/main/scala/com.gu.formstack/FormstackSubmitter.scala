@@ -28,7 +28,7 @@ class FormstackSubmitter[F[_]: Effect](httpClient: Client[F], oauthToken: String
 
   private def getFormId(json: Json): F[String] =
     json.hcursor.downField("formId").as[String] match {
-      case Left(e)   => 
+      case Left(e) =>
         logger.error("Missing `formId` in request payload", e) *> Effect[F].raiseError(e)
       case Right(formId) => Effect[F].pure(formId)
     }

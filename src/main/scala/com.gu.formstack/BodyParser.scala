@@ -12,7 +12,7 @@ class RequestBody[F[_]](logger: LoggingService[F]) {
 
   def decode(body: String): F[Json] = sync.suspend {
     parse(body) match {
-      case Left(e) => 
+      case Left(e) =>
         logger.error(s"The payload isn't valid JSON:\n$body", e) *> sync.raiseError(e)
       case Right(json) => sync.pure(json)
     }
