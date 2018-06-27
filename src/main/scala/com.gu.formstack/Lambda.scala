@@ -9,9 +9,13 @@ import java.io.{ InputStream, OutputStream }
 class FormStackLambda extends IOLambda {
 
   def main(is: InputStream, os: OutputStream, ctx: Context): IO[Unit] =
-    for {
-      process <- Process[IO]
-      _ <- process.run(is, os)
-    } yield ()
+    Environment.getToken match {
+      case Some(oauthToken) =>
+        for {
+          process <- Process[IO](oauthToken)
+          _ <- process.run(is, os)
+        } yield ()
+      case None => throw new RuntimeException("Missing OAUTH_TOKEN")
+    }
 
 }
