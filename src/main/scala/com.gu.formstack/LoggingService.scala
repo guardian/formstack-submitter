@@ -17,8 +17,8 @@ trait LoggingService[F[_]] {
     logger.warn(msg)
   }
 
-  def error(msg: String): F[Unit] = sync.delay {
-    logger.error(msg)
+  def error(msg: String, err: Throwable): F[Unit] = sync.delay {
+    logger.error(msg, err)
   }
 }
 
