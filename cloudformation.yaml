@@ -68,7 +68,7 @@ Resources:
     APIRestAPI:
         Type: AWS::ApiGateway::RestApi
         Properties:
-            Name: FormstackAPI-${Stage}
+            Name: !Sub FormstackAPI-${Stage}
     APIPermission:
         Type: AWS::Lambda::Permission
         Properties:
