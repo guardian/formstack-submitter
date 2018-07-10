@@ -19,7 +19,7 @@ class FormStackLambda extends Logging {
 
   /** The main action is trivial, it creates a processor and runs it right away */
   def main(body: String): IO[String] =
-    Environment.getToken match {
+    getToken match {
       case Some(oauthToken) =>
         for {
           process <- Process(oauthToken)
@@ -29,5 +29,9 @@ class FormStackLambda extends Logging {
         logger.error("Missing OAUTH_TOKEN")
         throw new RuntimeException("Missing OAUTH_TOKEN")
     }
+
+  def getToken: Option[String] = {
+    Option(System.getenv.get("OAUTH_TOKEN"))
+  }
 
 }
