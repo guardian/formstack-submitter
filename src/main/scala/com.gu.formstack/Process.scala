@@ -2,17 +2,15 @@ package com.gu.formstack
 
 // ------------------------------------------------------------------------
 import cats.effect.IO
-import com.amazonaws.services.lambda.runtime.LambdaLogger
-import com.gu.formstack.services.LoggingService
 import io.circe.Json
 import io.circe.parser.parse
+import org.apache.logging.log4j.scala.Logging
 import org.http4s.client.blaze.Http1Client
 // ------------------------------------------------------------------------
 
 class Process private (
-  val submitter: FormstackSubmitter,
-  val logger: LoggingService
-) {
+  val submitter: FormstackSubmitter
+) extends Logging {
 
   /** First we decode the request body into a valid JSON object and then submit it to FormStack, returning whatever we got back */
   def run(body: String): IO[String] =
@@ -44,7 +42,7 @@ class Process private (
       jsonBody <- parse(field)
     } yield jsonBody) match {
       case Left(e) =>
-        logger.error(s"The payload isn't valid JSON:\n$body", e)
+        logger.warn(s"The payload isn't valid JSON:\n$body", e)
         IO.raiseError(e)
       case Right(json) => IO.pure(json)
     }
@@ -55,11 +53,9 @@ class Process private (
 object Process {
 
   /** Creating an HTTP client is an action so the whole process itself becomes an action */
-  def apply(oauthToken: String, logger: LambdaLogger): IO[Process] =
+  def apply(oauthToken: String): IO[Process] =
     Http1Client[IO]() map { httpClient =>
-      val log = new LoggingService(logger)
-      val submitter = new FormstackSubmitter(httpClient, oauthToken, log)
-
-      new Process(submitter, log)
+      val submitter = new FormstackSubmitter(httpClient, oauthToken)
+      new Process(submitter)
     }
 }

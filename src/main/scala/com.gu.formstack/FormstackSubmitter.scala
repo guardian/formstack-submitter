@@ -3,8 +3,8 @@ package com.gu.formstack
 // ------------------------------------------------------------------------
 import cats.effect.IO
 import cats.syntax.applicativeError._
-import com.gu.formstack.services.LoggingService
 import io.circe.Json
+import org.apache.logging.log4j.scala.Logging
 import org.http4s.{ AuthScheme, Credentials, Header, Response, Uri }
 import org.http4s.circe._
 import org.http4s.client.Client
@@ -13,7 +13,7 @@ import org.http4s.headers.Authorization
 import org.http4s.Method.POST
 // ------------------------------------------------------------------------
 
-class FormstackSubmitter(httpClient: Client[IO], oauthToken: String, logger: LoggingService) {
+class FormstackSubmitter(httpClient: Client[IO], oauthToken: String) extends Logging {
 
   /** The form submission API is accessible at /form/:formId/submission.json
    * - The formId is extracted
