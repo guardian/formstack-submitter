@@ -1,24 +1,23 @@
 package com.gu.formstack
 
 // ------------------------------------------------------------------------
-import cats.effect.IO
+import cats.effect.Effect
+import cats.syntax.flatMap._
+import cats.syntax.functor._
 import com.amazonaws.services.lambda.runtime.Context
-import com.gu.formstack.utils._
 import java.io.{ InputStream, OutputStream }
-import org.apache.logging.log4j.scala.Logging
+import org.http4s.client.dsl.Http4sClientDsl
 // ------------------------------------------------------------------------
 
-class FormStackLambda extends Logging {
+trait Lambda[F[_]] {
 
-  /** Entry point: we read off the input stream, perform the main action and send the output back to the output stream */
-  def handle(is: InputStream, os: OutputStream, ctx: Context): Unit = {
-    val in = StreamOps.consume(is)
-    val out = main(in).unsafeRunSync
-    StreamOps.writeAndClose(os, out)
-  }
+  implicit val F: Effect[F]
+  implicit val DSL: Http4sClientDsl[F]
+
+  def handle(is: InputStream, os: OutputStream, ctx: Context): Unit
 
   /** The main action is trivial, it creates a processor and runs it right away */
-  def main(body: String): IO[String] =
+  def main(body: String): F[String] =
     getToken match {
       case Some(oauthToken) =>
         for {
@@ -26,12 +25,10 @@ class FormStackLambda extends Logging {
           res <- process.run(body)
         } yield res
       case None =>
-        logger.error("Missing OAUTH_TOKEN")
-        throw new RuntimeException("Missing OAUTH_TOKEN")
+        F.raiseError(new RuntimeException("Missing OAUTH_TOKEN"))
     }
 
   def getToken: Option[String] = {
     Option(System.getenv.get("OAUTH_TOKEN"))
   }
-
 }
