@@ -1,4 +1,4 @@
-package com.gu.formstack
+package com.gu.formstack.utils
 
 // ------------------------------------------------------------------------
 import java.io.{ InputStream, OutputStream }

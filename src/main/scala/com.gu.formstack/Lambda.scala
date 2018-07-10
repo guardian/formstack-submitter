@@ -3,6 +3,7 @@ package com.gu.formstack
 // ------------------------------------------------------------------------
 import cats.effect.IO
 import com.amazonaws.services.lambda.runtime.{ Context, LambdaLogger }
+import com.gu.formstack.utils._
 import java.io.{ InputStream, OutputStream }
 // ------------------------------------------------------------------------
 
