@@ -4,6 +4,7 @@ object Dependencies {
   val awsVersion = "1.1.0"
   val circeVersion = "0.9.3"
   val http4sVersion = "0.18.15"
+  val log4jVersion = "11.0"
 
   lazy val circe = Seq(
     "circe-core",
@@ -21,5 +22,9 @@ object Dependencies {
     "http4s-blaze-client",
     "http4s-circe"
   ).map("org.http4s" %% _ % http4sVersion)
+
+  lazy val log4j = Seq(
+    "log4j-api-scala"
+  ).map("org.apache.logging.log4j" %% _ % log4jVersion)
 
 }

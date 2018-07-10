@@ -5,9 +5,10 @@ import cats.effect.IO
 import com.amazonaws.services.lambda.runtime.{ Context, LambdaLogger }
 import com.gu.formstack.utils._
 import java.io.{ InputStream, OutputStream }
+import org.apache.logging.log4j.scala.Logging
 // ------------------------------------------------------------------------
 
-class FormStackLambda {
+class FormStackLambda extends Logging {
 
   /** Entry point: we read off the input stream, perform the main action and send the output back to the output stream */
   def handle(is: InputStream, os: OutputStream, ctx: Context): Unit = {
@@ -25,7 +26,9 @@ class FormStackLambda {
           process <- Process(oauthToken, logger)
           res <- process.run(body)
         } yield res
-      case None => throw new RuntimeException("Missing OAUTH_TOKEN")
+      case None => 
+        logger.error("Missing OAUTH_TOKEN")
+        throw new RuntimeException("Missing OAUTH_TOKEN")
     }
 
 }
