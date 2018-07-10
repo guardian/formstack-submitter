@@ -3,6 +3,7 @@ package com.gu.formstack
 // ------------------------------------------------------------------------
 import cats.effect.IO
 import com.amazonaws.services.lambda.runtime.LambdaLogger
+import com.gu.formstack.services.LoggingService
 import io.circe.Json
 import io.circe.parser.parse
 import org.http4s.client.blaze.Http1Client

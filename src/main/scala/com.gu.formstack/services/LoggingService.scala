@@ -1,4 +1,4 @@
-package com.gu.formstack
+package com.gu.formstack.services
 
 // ------------------------------------------------------------------------
 import com.amazonaws.services.lambda.runtime.LambdaLogger

@@ -3,6 +3,7 @@ package com.gu.formstack
 // ------------------------------------------------------------------------
 import cats.effect.IO
 import cats.syntax.applicativeError._
+import com.gu.formstack.services.LoggingService
 import io.circe.Json
 import org.http4s.{ AuthScheme, Credentials, Header, Response, Uri }
 import org.http4s.circe._
