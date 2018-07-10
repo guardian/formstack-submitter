@@ -11,12 +11,13 @@ import org.http4s.client.blaze.Http1Client
 
 class Process private (
   val submitter: FormstackSubmitter,
-  val requestBody: RequestBody,
   val logger: LoggingService
 ) {
-  def run(body: String): IO[String] = 
+
+  /** First we decode the request body into a valid JSON object and then submit it to FormStack, returning whatever we got back */
+  def run(body: String): IO[String] =
     for {
-      json <- requestBody.decode(body)
+      json <- decode(body)
       resp <- submitter.transmit(json)
     } yield resp.noSpaces
 
@@ -33,7 +34,7 @@ class Process private (
    *   "body": "A JSON string of the request payload."
    *   "isBase64Encoded": "A boolean flag to indicate if the applicable request payload is Base64-encode"
    * }
-   * 
+   *
    * The decoding process extracts the content of the body field, which is what we really need.
    */
   def decode(body: String): IO[Json] = IO.suspend {
@@ -56,9 +57,9 @@ object Process {
   /** Creating an HTTP client is an action so the whole process itself becomes an action */
   def apply(oauthToken: String, logger: LambdaLogger): IO[Process] =
     Http1Client[IO]() map { httpClient =>
-    val log = new LoggingService(logger)
+      val log = new LoggingService(logger)
       val submitter = new FormstackSubmitter(httpClient, oauthToken, log)
 
       new Process(submitter, log)
-  }
+    }
 }

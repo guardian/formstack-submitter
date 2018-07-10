@@ -9,6 +9,7 @@ import java.io.{ InputStream, OutputStream }
 
 class FormStackLambda {
 
+  /** Entry point: we read off the input stream, perform the main action and send the output back to the output stream */
   def handle(is: InputStream, os: OutputStream, ctx: Context): Unit = {
     val in = StreamOps.consume(is)
     val logger = ctx.getLogger
@@ -16,6 +17,7 @@ class FormStackLambda {
     StreamOps.writeAndClose(os, out)
   }
 
+  /** The main action is trivial, it creates a processor and runs it right away */
   def main(body: String, logger: LambdaLogger): IO[String] =
     Environment.getToken match {
       case Some(oauthToken) =>
