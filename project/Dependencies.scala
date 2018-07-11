@@ -27,4 +27,9 @@ object Dependencies {
     "log4j-api-scala"
   ).map("org.apache.logging.log4j" %% _ % log4jVersion)
 
+  lazy val testing = Seq(
+    "org.scalatest" %% "scalatest" % "3.0.5" % Test,
+    "org.scalacheck" %% "scalacheck" % "1.14.0" % Test
+  )
+
 }
