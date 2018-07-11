@@ -20,13 +20,10 @@ trait Lambda[F[_]] {
 
   /** The main action is trivial, it creates a processor and runs it right away */
   def main(body: String): F[String] =
-    Settings(System.getenv.asScala.toMap) match {
-      case Right(settings) =>
-        for {
-          process <- Process(settings)
-          res <- process.run(body)
-        } yield res
-      case Left(msg) =>
-        F.raiseError(new RuntimeException(msg))
-    }
+    Settings(System.getenv.asScala.toMap).map { settings =>
+      for {
+        process <- Process(settings)
+        res <- process.run(body)
+      } yield res
+    }.valueOr(msgs => F.raiseError(new RuntimeException(msgs.reduceLeft(_ + "\n" + _))))
 }
