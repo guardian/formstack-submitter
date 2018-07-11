@@ -5,6 +5,7 @@ import cats.effect.Effect
 import cats.syntax.applicativeError._
 import cats.syntax.functor._
 import cats.syntax.flatMap._
+import com.gu.formstack.utils.Settings
 import io.circe.Json
 import org.apache.logging.log4j.scala.Logging
 import org.http4s.{ AuthScheme, Credentials, Header, Response, Uri }
@@ -15,7 +16,9 @@ import org.http4s.headers.Authorization
 import org.http4s.Method.POST
 // ------------------------------------------------------------------------
 
-class FormstackSubmitter[F[_]](httpClient: Client[F], oauthToken: String)(implicit F: Effect[F], DSL: Http4sClientDsl[F]) extends Logging {
+class FormstackSubmitter[F[_]](httpClient: Client[F], settings: Settings)(implicit F: Effect[F],
+                                                                          DSL: Http4sClientDsl[F])
+    extends Logging {
   import DSL._
 
   /** The form submission API is accessible at /form/:formId/submission.json
@@ -27,7 +30,7 @@ class FormstackSubmitter[F[_]](httpClient: Client[F], oauthToken: String)(implic
   def transmit(json: Json): F[Json] =
     for {
       formId <- getFormId(json)
-      request <- POST(endpoint(formId), json)
+      request <- POST(url(formId), json)
       response <- httpClient.fetch(request.putHeaders(header))(format)
     } yield response
 
@@ -63,8 +66,7 @@ class FormstackSubmitter[F[_]](httpClient: Client[F], oauthToken: String)(implic
         )
       )
 
-  private def endpoint(formId: String): Uri =
-    Uri.uri("https://www.formstack.com/api/v2/form/") / formId / "submission.json"
+  private def url(formId: String): Uri = settings.endpoint / formId / "submission.json"
 
-  private final val header: Header = Authorization(Credentials.Token(AuthScheme.Bearer, oauthToken))
+  private final val header: Header = Authorization(Credentials.Token(AuthScheme.Bearer, settings.oauthToken))
 }

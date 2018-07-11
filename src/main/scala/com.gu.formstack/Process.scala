@@ -4,6 +4,7 @@ package com.gu.formstack
 import cats.effect.Effect
 import cats.syntax.flatMap._
 import cats.syntax.functor._
+import com.gu.formstack.utils.Settings
 import io.circe.Json
 import io.circe.parser.parse
 import org.apache.logging.log4j.scala.Logging
@@ -13,7 +14,8 @@ import org.http4s.client.dsl.Http4sClientDsl
 
 class Process[F[_]] private (
   val submitter: FormstackSubmitter[F]
-)(implicit F: Effect[F]) extends Logging {
+)(implicit F: Effect[F])
+    extends Logging {
 
   /** First we decode the request body into a valid JSON object and then submit it to FormStack, returning whatever we got back */
   def run(body: String): F[String] =
@@ -56,9 +58,9 @@ class Process[F[_]] private (
 object Process {
 
   /** Creating an HTTP client is an action so the whole process itself becomes an action */
-  def apply[F[_]: Effect: Http4sClientDsl](oauthToken: String): F[Process[F]] =
+  def apply[F[_]: Effect: Http4sClientDsl](settings: Settings): F[Process[F]] =
     Http1Client[F]() map { httpClient =>
-      val submitter = new FormstackSubmitter(httpClient, oauthToken)
+      val submitter = new FormstackSubmitter(httpClient, settings)
       new Process(submitter)
     }
 }

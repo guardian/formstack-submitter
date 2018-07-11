@@ -17,6 +17,10 @@ Parameters:
             - PROD
             - CODE
         Default: CODE
+    FormStackUrl:
+        Description: Base URL of the FormStack API
+        Type: String
+        Default: https://www.formstack.com/api/v2/form
     OAuthToken:
         Description: The authentication token for accessing the FormStack API
         Type: String
