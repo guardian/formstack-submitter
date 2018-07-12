@@ -49,6 +49,7 @@ Resources:
             Environment:
                 Variables:
                     OAUTH_TOKEN: !Ref OAuthToken
+                    FORMSTACK_URL: !Ref FormStackUrl
             CodeUri:
                 Bucket: content-api-dist
                 Key: !Sub ${Stack}/${Stage}/${App}/${App}.zip
