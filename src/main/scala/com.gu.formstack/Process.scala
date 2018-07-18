@@ -59,7 +59,7 @@ object Process {
 
   /** Creating an HTTP client is an action so the whole process itself becomes an action */
   def apply[F[_]: Effect: Http4sClientDsl](settings: Settings): F[Process[F]] =
-    Http1Client[F](BlazeClientConfig.defaultConfig) map { httpClient =>
+    Http1Client[F](BlazeClientConfig.defaultConfig)(Effect[F]) map { httpClient =>
       val submitter = new FormstackSubmitter(httpClient, settings)
       new Process(submitter)
     }
