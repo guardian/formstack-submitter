@@ -8,7 +8,7 @@ import com.gu.formstack.utils.Settings
 import io.circe.Json
 import io.circe.parser.parse
 import org.apache.logging.log4j.scala.Logging
-import org.http4s.client.blaze.Http1Client
+import org.http4s.client.blaze.{ Http1Client, BlazeClientConfig }
 import org.http4s.client.dsl.Http4sClientDsl
 // ------------------------------------------------------------------------
 
@@ -59,7 +59,7 @@ object Process {
 
   /** Creating an HTTP client is an action so the whole process itself becomes an action */
   def apply[F[_]: Effect: Http4sClientDsl](settings: Settings): F[Process[F]] =
-    Http1Client[F]() map { httpClient =>
+    Http1Client[F](BlazeClientConfig.defaultConfig) map { httpClient =>
       val submitter = new FormstackSubmitter(httpClient, settings)
       new Process(submitter)
     }
