@@ -1,24 +1,21 @@
 package com.gu.formstack
 
 // ------------------------------------------------------------------------
-import cats.effect.Effect
-import cats.syntax.flatMap._
-import cats.syntax.functor._
+import cats.effect.IO
 import com.gu.formstack.utils.Settings
 import io.circe.Json
 import io.circe.parser.parse
 import org.apache.logging.log4j.scala.Logging
-import org.http4s.client.blaze.{ Http1Client, BlazeClientConfig }
-import org.http4s.client.dsl.Http4sClientDsl
+import org.http4s.client.blaze.{ Http1Client }
 // ------------------------------------------------------------------------
 
-class Process[F[_]] private (
-  val submitter: FormstackSubmitter[F]
-)(implicit F: Effect[F])
+class Process private (
+  val submitter: FormstackSubmitter
+)
     extends Logging {
 
   /** First we decode the request body into a valid JSON object and then submit it to FormStack, returning whatever we got back */
-  def run(body: String): F[String] =
+  def run(body: String): IO[String] =
     for {
       json <- decode(body)
       resp <- submitter.transmit(json)
@@ -40,7 +37,7 @@ class Process[F[_]] private (
    *
    * The decoding process extracts the content of the body field, which is what we really need.
    */
-  def decode(body: String): F[Json] = F.suspend {
+  def decode(body: String): IO[Json] = IO.suspend {
     (for {
       json <- parse(body)
       field <- json.hcursor.downField("body").as[String]
@@ -48,8 +45,8 @@ class Process[F[_]] private (
     } yield jsonBody) match {
       case Left(e) =>
         logger.warn(s"The payload isn't valid JSON:\n$body", e)
-        F.raiseError(e)
-      case Right(json) => F.pure(json)
+        IO.raiseError(e)
+      case Right(json) => IO.pure(json)
     }
   }
 
@@ -58,8 +55,8 @@ class Process[F[_]] private (
 object Process {
 
   /** Creating an HTTP client is an action so the whole process itself becomes an action */
-  def apply[F[_]: Effect: Http4sClientDsl](settings: Settings): F[Process[F]] =
-    Http1Client[F](BlazeClientConfig.defaultConfig)(Effect[F]) map { httpClient =>
+  def apply(settings: Settings): IO[Process] =
+    Http1Client[IO]() map { httpClient =>
       val submitter = new FormstackSubmitter(httpClient, settings)
       new Process(submitter)
     }
