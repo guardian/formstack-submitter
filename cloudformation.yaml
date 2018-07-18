@@ -53,9 +53,9 @@ Resources:
             CodeUri:
                 Bucket: content-api-dist
                 Key: !Sub ${Stack}/${Stage}/${App}/${App}.zip
-            MemorySize: 256
+            MemorySize: 320
             Runtime: java8
-            Timeout: 15
+            Timeout: 30
     ApiFrontend:
         DependsOn: APIPermission
         Type: AWS::ApiGateway::Method
