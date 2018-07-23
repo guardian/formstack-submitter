@@ -59,7 +59,7 @@ class FormstackSubmitter(httpClient: Client[IO], settings: Settings)
             "isBase64Encoded" -> Json.False,
             "statusCode" -> Json.fromInt(response.status.code),
             "headers" -> Json.obj(
-              "Access-Control-Allow-Origin" -> Json.fromString("'*'")
+              "Access-Control-Allow-Origin" -> Json.fromString("*")
             ),
             "body" -> Json.fromString(json.noSpaces)
         )
