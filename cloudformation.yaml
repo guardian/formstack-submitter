@@ -55,7 +55,7 @@ Resources:
                 Key: !Sub ${Stack}/${Stage}/${App}/${App}.zip
             MemorySize: 320
             Runtime: java8
-            Timeout: 30
+            Timeout: 300
     ApiFrontend:
         DependsOn: APIPermission
         Type: AWS::ApiGateway::Method
